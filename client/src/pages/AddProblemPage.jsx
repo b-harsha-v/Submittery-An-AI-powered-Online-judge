@@ -1,6 +1,6 @@
 // client/src/pages/AddProblemPage.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../components/ThemeProvider';
@@ -9,7 +9,6 @@ const AddProblemPage = () => {
     const [title, setTitle] = useState('');
     const [statement, setStatement] = useState('');
     const [difficulty, setDifficulty] = useState('Easy');
-    // New state for hidden test cases
     const [hiddenTestCases, setHiddenTestCases] = useState([{ input: '', output: '' }]);
     const { theme } = useTheme();
 
@@ -44,7 +43,8 @@ const AddProblemPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('/api/problems', { 
+            // Changed from 'axios.post' to 'api.post'
+            await api.post('/api/problems', { 
                 title, 
                 statement, 
                 difficulty, 

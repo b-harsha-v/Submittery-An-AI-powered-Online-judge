@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { AuthContext } from '../context/AuthContext';
@@ -37,13 +37,13 @@ const ProblemDetailPage = () => {
     const { theme } = useTheme();
 
     // All handler functions and useEffects remain the same
-    useEffect(() => { const fetchProblem = async () => { try { const res = await axios.get(`/api/problems/${problemId}`); setProblem(res.data); } catch (error) { console.error('Failed to fetch problem', error); } finally { setLoading(false); } }; fetchProblem(); }, [problemId]);
-    useEffect(() => { const fetchSubmissions = async () => { if (authUser) { try { const res = await axios.get(`/api/submissions/problem/${problemId}`); setSubmissions(res.data); } catch (error) { console.error("Failed to fetch submissions", error); } } }; fetchSubmissions(); }, [problemId, authUser, result]);
-    const handleSubmit = async () => { if (!authUser) { alert('Please log in.'); return; } setIsSubmitting(true); setResult(null); setDebugExplanation(''); try { const res = await axios.post('/api/submissions', { language, code, problemId }); setResult(res.data); } catch (error) { setResult({ verdict: 'Error', output: 'Submission failed.' }); } finally { setIsSubmitting(false); } };
-    const handleRunCode = async () => { if (!authUser) { alert('Please log in.'); return; } setIsRunning(true); setRunOutput(null); try { const res = await axios.post('/api/submissions/run-custom', { language, code, input: customInput }); setRunOutput(res.data); } catch (error) { setRunOutput({ verdict: 'Error', error: 'Run failed.' }); } finally { setIsRunning(false); } };
-    const handleExplainProblem = async () => { setIsExplaining(true); try { const res = await axios.post('/api/ai/explain', { problemId }); setExplanation(res.data.explanation); setIsExplained(true); } catch (error) { setExplanation("Couldn't get explanation."); } finally { setIsExplaining(false); } };
-    const handleDebugCode = async () => { setIsDebugging(true); setDebugExplanation(''); try { const res = await axios.post('/api/ai/debug', { problemId, userCode: code, language, verdict: result.verdict, actualOutput: result.output }); setDebugExplanation(res.data.explanation); } catch (error) { setDebugExplanation("Couldn't get debug hint."); } finally { setIsDebugging(false); } };
-    const handleCodeReview = async () => { if (!authUser) { alert('Please log in.'); return; } setIsReviewModalOpen(true); setIsReviewing(true); setReview(''); try { const res = await axios.post('/api/ai/review', { language, code }); setReview(res.data.review); } catch (error) { setReview('An error occurred.'); } finally { setIsReviewing(false); } };
+    useEffect(() => { const fetchProblem = async () => { try { const res = await api.get(`/api/problems/${problemId}`); setProblem(res.data); } catch (error) { console.error('Failed to fetch problem', error); } finally { setLoading(false); } }; fetchProblem(); }, [problemId]);
+    useEffect(() => { const fetchSubmissions = async () => { if (authUser) { try { const res = await api.get(`/api/submissions/problem/${problemId}`); setSubmissions(res.data); } catch (error) { console.error("Failed to fetch submissions", error); } } }; fetchSubmissions(); }, [problemId, authUser, result]);
+    const handleSubmit = async () => { if (!authUser) { alert('Please log in.'); return; } setIsSubmitting(true); setResult(null); setDebugExplanation(''); try { const res = await api.post('/api/submissions', { language, code, problemId }); setResult(res.data); } catch (error) { setResult({ verdict: 'Error', output: 'Submission failed.' }); } finally { setIsSubmitting(false); } };
+    const handleRunCode = async () => { if (!authUser) { alert('Please log in.'); return; } setIsRunning(true); setRunOutput(null); try { const res = await api.post('/api/submissions/run-custom', { language, code, input: customInput }); setRunOutput(res.data); } catch (error) { setRunOutput({ verdict: 'Error', error: 'Run failed.' }); } finally { setIsRunning(false); } };
+    const handleExplainProblem = async () => { setIsExplaining(true); try { const res = await api.post('/api/ai/explain', { problemId }); setExplanation(res.data.explanation); setIsExplained(true); } catch (error) { setExplanation("Couldn't get explanation."); } finally { setIsExplaining(false); } };
+    const handleDebugCode = async () => { setIsDebugging(true); setDebugExplanation(''); try { const res = await api.post('/api/ai/debug', { problemId, userCode: code, language, verdict: result.verdict, actualOutput: result.output }); setDebugExplanation(res.data.explanation); } catch (error) { setDebugExplanation("Couldn't get debug hint."); } finally { setIsDebugging(false); } };
+    const handleCodeReview = async () => { if (!authUser) { alert('Please log in.'); return; } setIsReviewModalOpen(true); setIsReviewing(true); setReview(''); try { const res = await api.post('/api/ai/review', { language, code }); setReview(res.data.review); } catch (error) { setReview('An error occurred.'); } finally { setIsReviewing(false); } };
 
     if (loading) return <div>Loading problem...</div>;
     if (!problem) return <div>Problem not found.</div>;

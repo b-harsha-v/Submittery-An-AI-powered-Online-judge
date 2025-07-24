@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from "@/components/ui/button";
 
@@ -14,7 +14,7 @@ const Navbar = () => {
     const handleLogout = async () => {
         setIsLoading(true);
         try {
-            await axios.post('/api/auth/logout');
+            await api.post('/api/auth/logout'); // Changed from axios.post
             setAuthUser(null);
             navigate('/login');
         } catch (error) {

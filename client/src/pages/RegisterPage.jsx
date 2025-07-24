@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -21,7 +21,7 @@ const RegisterPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('/api/auth/register', formData);
+            const res = await api.post('/api/auth/register', formData); // Changed from axios.post
             console.log('Registration successful:', res.data);
             alert('Registration successful! Please login.');
             navigate('/login');

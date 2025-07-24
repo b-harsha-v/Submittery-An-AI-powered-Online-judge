@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import api from '../api/axios'; // Changed from 'axios'
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../components/ThemeProvider';
@@ -12,7 +12,7 @@ const ProblemsListPage = () => {
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const res = await axios.get('/api/problems');
+                const res = await api.get('/api/problems'); // Changed from axios.get
                 setProblems(res.data);
             } catch (error) {
                 console.error('Failed to fetch problems', error);

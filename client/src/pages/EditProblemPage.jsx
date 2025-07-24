@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { useNavigate, useParams } from 'react-router-dom';
 
 const EditProblemPage = () => {
@@ -10,7 +10,7 @@ const EditProblemPage = () => {
     useEffect(() => {
         const fetchProblem = async () => {
             try {
-                const res = await axios.get(`/api/problems/${id}`);
+                const res = await api.get(`/api/problems/${id}`); // Changed from axios.get
                 setProblem(res.data);
             } catch (error) {
                 console.error('Failed to fetch problem data', error);
@@ -19,7 +19,6 @@ const EditProblemPage = () => {
         fetchProblem();
     }, [id]);
 
-    // Handlers for form changes (similar to AddProblemPage)
     const handleChange = (e) => {
          setProblem({ ...problem, [e.target.name]: e.target.value });
     }
@@ -37,11 +36,10 @@ const EditProblemPage = () => {
         setProblem({ ...problem, hiddenTestCases: values });
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`/api/problems/${id}`, problem);
+            await api.put(`/api/problems/${id}`, problem); // Changed from axios.put
             alert('Problem updated successfully!');
             navigate('/admin/problems');
         } catch (error) {

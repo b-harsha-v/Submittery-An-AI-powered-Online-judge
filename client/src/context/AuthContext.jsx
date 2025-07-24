@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 
 // Create the context
 export const AuthContext = createContext(null);
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
         const fetchCurrentUser = async () => {
             try {
                 // Check if a user is already logged in
-                const res = await axios.get('/api/auth/me');
+                const res = await api.get('/api/auth/me'); // Changed from axios.get
                 setAuthUser(res.data);
             } catch (error) {
                 // No user is logged in, or the token is invalid

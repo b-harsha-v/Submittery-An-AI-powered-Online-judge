@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTheme } from '../components/ThemeProvider';
@@ -11,7 +11,7 @@ const AdminProblemsListPage = () => {
 
     const fetchProblems = async () => {
         try {
-            const res = await axios.get('/api/problems');
+            const res = await api.get('/api/problems'); // Changed from axios.get
             setProblems(res.data);
         } catch (error) {
             console.error('Failed to fetch problems', error);
@@ -27,7 +27,7 @@ const AdminProblemsListPage = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this problem?')) {
             try {
-                await axios.delete(`/api/problems/${id}`);
+                await api.delete(`/api/problems/${id}`); // Changed from axios.delete
                 alert('Problem deleted successfully!');
                 fetchProblems(); // Refresh the list
             } catch (error) {

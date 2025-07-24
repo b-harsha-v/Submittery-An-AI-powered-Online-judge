@@ -1,6 +1,5 @@
-// client/src/pages/LoginPage.jsx
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // Changed from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -19,7 +18,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('/api/auth/login', formData);
+            const res = await api.post('/api/auth/login', formData); // Changed from axios.post
             console.log('Login successful:', res.data);
             setAuthUser(res.data);
             navigate('/');
