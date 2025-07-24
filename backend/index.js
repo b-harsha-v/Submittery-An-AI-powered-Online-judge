@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:5173', // Your Vite dev server URL
+    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Your Vite dev server URL
     credentials: true,
 }));
 app.use(express.json()); // To parse JSON bodies
