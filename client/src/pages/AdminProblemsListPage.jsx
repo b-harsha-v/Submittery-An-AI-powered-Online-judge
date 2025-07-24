@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useTheme } from '../components/ThemeProvider';
 
 const AdminProblemsListPage = () => {
     const [problems, setProblems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
 
     const fetchProblems = async () => {
         try {
-            const res = await axios.get('/api/problems'); // We can reuse the public endpoint
+            const res = await axios.get('/api/problems');
             setProblems(res.data);
         } catch (error) {
             console.error('Failed to fetch problems', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -31,38 +37,144 @@ const AdminProblemsListPage = () => {
         }
     };
 
+    // Theme-based styles
+    const cardBg = theme === 'dark' ? 'bg-gray-900/80' : 'bg-white/80';
+    const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-800';
+    const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+    const headerBg = theme === 'dark' ? 'bg-purple-900/70' : 'bg-purple-600/90';
+    const rowHover = theme === 'dark' ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100/70';
+    const difficultyColor = (difficulty) => {
+        if (theme === 'dark') {
+            return difficulty === 'Easy' ? 'text-green-400' : 
+                   difficulty === 'Medium' ? 'text-yellow-400' : 'text-red-400';
+        }
+        return difficulty === 'Easy' ? 'text-green-600' : 
+               difficulty === 'Medium' ? 'text-yellow-600' : 'text-red-600';
+    };
+
+    if (loading) {
+        return (
+            <div className={`flex justify-center items-center min-h-[calc(100vh-4rem)] ${textColor}`}>
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    className="w-12 h-12 border-t-2 border-b-2 border-purple-500 rounded-full"
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Manage Problems</h1>
-                <Link to="/admin/add-problem" className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">
-                    Add New Problem
-                </Link>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className={`container mx-auto p-4 min-h-[calc(100vh-4rem)] ${textColor}`}
+        >
+            <div className="max-w-7xl mx-auto">
+                <div className="flex justify-between items-center mb-8">
+                    <motion.h1 
+                        className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent"
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        Manage Problems
+                    </motion.h1>
+                    <Link 
+                        to="/admin/add-problem" 
+                        className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                            theme === 'dark' ? 
+                            'bg-purple-700 hover:bg-purple-600 text-white' : 
+                            'bg-purple-600 hover:bg-purple-700 text-white'
+                        }`}
+                    >
+                        Add New Problem
+                    </Link>
+                </div>
+
+                <motion.div
+                    className={`rounded-xl shadow-xl overflow-hidden backdrop-blur-lg border ${borderColor} ${cardBg}`}
+                    initial={{ scale: 0.98, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full">
+                            <thead>
+                                <tr className={`${headerBg} text-white`}>
+                                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">ID</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Title</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Difficulty</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Topics</th>
+                                    <th className="py-4 px-6 text-left font-semibold text-sm uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                {problems.map((problem, index) => (
+                                    <motion.tr 
+                                        key={problem._id}
+                                        className={`${rowHover} transition-colors duration-200`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.1 + index * 0.03 }}
+                                    >
+                                        <td className="py-4 px-6 whitespace-nowrap text-sm font-medium">
+                                            {index + 1}
+                                        </td>
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <Link 
+                                                to={`/admin/problems/edit/${problem._id}`} 
+                                                className={`text-sm font-medium hover:text-purple-500 transition-colors ${textColor}`}
+                                            >
+                                                {problem.title}
+                                            </Link>
+                                        </td>
+                                        <td className={`py-4 px-6 whitespace-nowrap text-sm font-bold ${difficultyColor(problem.difficulty)}`}>
+                                            {problem.difficulty}
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex flex-wrap gap-2">
+                                                {problem.tags?.map((tag, i) => (
+                                                    <span 
+                                                        key={i}
+                                                        className={`text-xs px-2 py-1 rounded-full ${
+                                                            theme === 'dark' ? 'bg-purple-900/50 text-purple-200' : 'bg-purple-100 text-purple-800'
+                                                        }`}
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6 whitespace-nowrap">
+                                            <div className="flex space-x-2">
+                                                <Link 
+                                                    to={`/admin/problems/edit/${problem._id}`} 
+                                                    className={`px-3 py-1 rounded-md text-sm ${
+                                                        theme === 'dark' ? 'bg-yellow-600 hover:bg-yellow-500' : 'bg-yellow-500 hover:bg-yellow-400'
+                                                    } text-white`}
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button 
+                                                    onClick={() => handleDelete(problem._id)}
+                                                    className={`px-3 py-1 rounded-md text-sm ${
+                                                        theme === 'dark' ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-400'
+                                                    } text-white`}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </motion.div>
             </div>
-            <div className="overflow-x-auto bg-white rounded-lg shadow">
-                <table className="min-w-full">
-                    <thead className="bg-gray-800 text-white">
-                        <tr>
-                            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Title</th>
-                            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Difficulty</th>
-                            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-gray-700">
-                        {problems.map((problem) => (
-                            <tr key={problem._id} className="border-t hover:bg-gray-100">
-                                <td className="text-left py-3 px-4">{problem.title}</td>
-                                <td className="text-left py-3 px-4">{problem.difficulty}</td>
-                                <td className="text-left py-3 px-4">
-                                    <Link to={`/admin/problems/edit/${problem._id}`} className="bg-yellow-500 text-white px-3 py-1 rounded text-sm mr-2 hover:bg-yellow-600">Edit</Link>
-                                    <button onClick={() => handleDelete(problem._id)} className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Delete</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </motion.div>
     );
 };
 
